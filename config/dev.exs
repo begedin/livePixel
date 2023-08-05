@@ -17,6 +17,12 @@ config :live_pixel, LivePixelWeb.Endpoint,
   watchers: [
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
+  ],
+  live_reload: [
+    patterns: [
+      ~r{priv/static/.*(js|ts|css|png|jpeg|jpg|gif|svg)$},
+      ~r{lib/live_pixel_web/live/.*(ex)$}
+    ]
   ]
 
 # ## SSL Support

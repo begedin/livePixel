@@ -1,12 +1,19 @@
 defmodule LivePixelWeb.Router do
   use LivePixelWeb, :router
 
-  pipeline :api do
-    plug :accepts, ["json"]
+  pipeline :browser do
+    plug(:accepts, ["html"])
+    plug(:fetch_session)
+    plug(:fetch_live_flash)
+    plug(:put_root_layout, {LivePixelWeb.Layouts, :root})
+    plug(:protect_from_forgery)
+    plug(:put_secure_browser_headers)
   end
 
-  scope "/api", LivePixelWeb do
-    pipe_through :api
+  scope "/", LivePixelWeb do
+    pipe_through [:browser]
+    live("/", DemosLive)
+    live("/snake", SnakeLive)
   end
 
   # Enable LiveDashboard in development
