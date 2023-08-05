@@ -9,7 +9,7 @@ defmodule LivePixelWeb.SnakeLive do
       Application.put_env(:ecsx, :persist_interval, :timer.seconds(50000))
       Snake.Manager.start_link([])
       ECSx.ClientEvents.add(player_id, :spawn)
-      :timer.send_interval(20, :send_update)
+      :timer.send_interval(floor(1000 / 60), :send_update)
     end
 
     {:ok, assign(socket, page_title: "Snake", player_id: player_id)}

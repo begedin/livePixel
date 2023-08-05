@@ -1,7 +1,6 @@
 defmodule Snake.Systems.Move do
   @behaviour ECSx.System
 
-  alias LSP.Types.Position
   alias Snake.Components.BodyPart
   alias Snake.Components.Color
   alias Snake.Components.Food
