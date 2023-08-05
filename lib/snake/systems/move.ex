@@ -13,11 +13,6 @@ defmodule Snake.Systems.Move do
 
   @impl ECSx.System
   def run do
-    BodyPart.get_all()
-    |> Enum.map(&{&1, Rank.get_one(&1)})
-    |> Enum.sort_by(&elem(&1, 1))
-    |> IO.inspect()
-
     BodyPart.get_all() |> Enum.sort_by(&Rank.get_one/1) |> move()
   end
 
