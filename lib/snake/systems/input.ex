@@ -14,7 +14,8 @@ defmodule Snake.Systems.Input do
     Snake.Components.Rank.add(entity, 0)
     Snake.Components.Direction.add(entity, "none")
     Snake.Components.Primitive.add(entity, "rectangle")
-    Snake.Components.Color.add(entity, 0xDE3249)
+    Snake.Components.Color.add(entity, 0xDE7749)
+    Snake.Components.Head.add(entity)
     Snake.Components.BodyPart.add(entity)
   end
 

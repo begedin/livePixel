@@ -19,7 +19,9 @@ defmodule Snake.Manager do
       Snake.Components.BodyPart,
       Snake.Components.Color,
       Snake.Components.Direction,
+      Snake.Components.Eaten,
       Snake.Components.Food,
+      Snake.Components.Head,
       Snake.Components.PositionX,
       Snake.Components.PositionY,
       Snake.Components.Primitive,
@@ -36,10 +38,10 @@ defmodule Snake.Manager do
   end
 
   def get_world do
-    x_map = Map.new(Snake.Components.PositionX.get_all())
-    y_map = Map.new(Snake.Components.PositionY.get_all())
-    shape_map = Map.new(Snake.Components.Primitive.get_all())
-    color_map = Map.new(Snake.Components.Color.get_all())
+    x_map = Snake.Components.PositionX.get_all() |> Enum.sort()
+    y_map = Snake.Components.PositionY.get_all() |> Enum.sort()
+    shape_map = Snake.Components.Primitive.get_all() |> Enum.sort()
+    color_map = Snake.Components.Color.get_all() |> Enum.sort()
 
     snake =
       [x_map, y_map, shape_map, color_map]

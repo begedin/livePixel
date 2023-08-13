@@ -3,39 +3,46 @@ defmodule Snake.Systems.Move do
 
   alias Snake.Components.BodyPart
   alias Snake.Components.Color
+  alias Snake.Components.Direction
+  alias Snake.Components.Eaten
   alias Snake.Components.Food
-  alias Snake.Components.Rank
+  alias Snake.Components.Head
   alias Snake.Components.PositionX
   alias Snake.Components.PositionY
   alias Snake.Components.Primitive
-  alias Snake.Components.Direction
+  alias Snake.Components.Rank
 
   @impl ECSx.System
   def run do
-    BodyPart.get_all() |> Enum.sort_by(&Rank.get_one/1) |> move()
+    case Head.get_all() do
+      [head] ->
+        move(head)
+
+      _ ->
+        :ok
+    end
+
+    :ok
   end
 
-  defp move([]), do: :ok
-
-  defp move([head | body] = snake) do
+  defp move(head) do
+    # where the head goes depends on the direction it's facing
     head_x = PositionX.get_one(head)
     head_y = PositionY.get_one(head)
-
     direction = Direction.get_one(head)
     {new_x, new_y} = Snake.Utils.next_position(head_x, head_y, direction)
 
+    # move the head
     PositionX.update(head, new_x)
     PositionY.update(head, new_y)
 
-    [tail_end | _] = Enum.reverse(snake)
-    end_x = PositionX.get_one(tail_end)
-    end_y = PositionY.get_one(tail_end)
+    # all body parts except the head, sorted by position from head to tail
+    body = BodyPart.get_all() |> List.delete(head) |> Enum.sort_by(&Rank.get_one/1)
 
-    if food_on?(head_x, head_y) do
-      grow(end_x, end_y, Enum.count(snake))
-      eat()
-    end
+    # get the old tail
+    tail_end = if body == [], do: head, else: Enum.at(body, -1)
 
+    # move the body - every body part is moved to the position of the previous one
     Enum.reduce(body, {head_x, head_y}, fn part, {prev_x, prev_y} ->
       x = PositionX.get_one(part)
       y = PositionY.get_one(part)
@@ -43,6 +50,15 @@ defmodule Snake.Systems.Move do
       PositionY.update(part, prev_y)
       {x, y}
     end)
+
+    # if the head has touched food, grow the snake by putting a new part at
+    # the old tail position
+    if food_on?(new_x, new_y) do
+      end_x = PositionX.get_one(tail_end)
+      end_y = PositionY.get_one(tail_end)
+      grow(end_x, end_y, Enum.count(body) + 1)
+      eat()
+    end
   end
 
   defp food_on?(x, y) do
@@ -67,12 +83,8 @@ defmodule Snake.Systems.Move do
 
   defp eat() do
     case Food.get_all() do
-      [id] ->
-        PositionX.update(id, Enum.random(0..39))
-        PositionY.update(id, Enum.random(0..39))
-
-      _ ->
-        nil
+      [id] -> Eaten.add(id)
+      _ -> nil
     end
   end
 end
