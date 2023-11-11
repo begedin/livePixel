@@ -33,8 +33,6 @@ defmodule Snake.Systems.Animation do
 
     {next_x, next_y} = Snake.Utils.next_position(head_x, head_y, direction)
 
-    IO.inspect({"#{head_x} -> #{next_x}", "#{head_y} -> #{next_y}"}, label: "animaton")
-
     now = System.system_time(:millisecond)
     time_since_move = now - time_of_last_move
 
@@ -57,6 +55,8 @@ defmodule Snake.Systems.Animation do
         interpolate(part_x, prev_x, time_since_move, time_per_move),
         interpolate(part_y, prev_y, time_since_move, time_per_move)
       )
+
+      {part_x, part_y}
     end)
   end
 

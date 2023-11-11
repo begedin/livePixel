@@ -22,6 +22,7 @@ defmodule Snake.Manager do
       Snake.Components.Eaten,
       Snake.Components.Food,
       Snake.Components.Head,
+      Snake.Components.NextDirection,
       Snake.Components.PositionX,
       Snake.Components.PositionY,
       Snake.Components.Primitive,

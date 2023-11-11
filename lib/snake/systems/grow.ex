@@ -19,8 +19,12 @@ defmodule Snake.Systems.Grow do
     case Eaten.get_all() do
       [id] ->
         Eaten.remove(id)
-        PositionX.update(id, Enum.random(0..39))
-        PositionY.update(id, Enum.random(0..39))
+        x = Enum.random(0..39)
+        y = Enum.random(0..39)
+        PositionX.update(id, x)
+        PositionY.update(id, y)
+        VisualX.update(id, x * 1.0)
+        VisualY.update(id, y * 1.0)
 
       _ ->
         :ok

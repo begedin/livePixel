@@ -11,7 +11,7 @@ type World = {
 }[];
 
 type Hook = {
-  el: HTMLElement;
+  el: HTMLDivElement;
   mounted: () => void | Promise<void>;
   handleEvent: (
     name: "update",
@@ -22,10 +22,20 @@ type Hook = {
 export const pixi: Hook = {
   async mounted() {
     const app = new PIXI.Application({
+      height: 800,
+      width: 800,
       background: "#1099bb",
-      resizeTo: window,
     });
-    (this.el as HTMLDivElement).appendChild(app.view as unknown as Element);
+    this.el.style.display = "flex";
+    this.el.style.justifyContent = "center";
+    this.el.style.alignItems = "center";
+    this.el.style.height = "100vh";
+    this.el.style.width = "100vw";
+    if (app.view.style) {
+      app.view.style.width = "min(100%, 100vh)";
+    }
+
+    this.el.appendChild(app.view as unknown as Element);
 
     const entities = new Map<string, PIXI.Graphics>();
 

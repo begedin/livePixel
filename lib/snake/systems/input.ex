@@ -9,6 +9,7 @@ defmodule Snake.Systems.Input do
   alias Snake.Components.BodyPart
   alias Snake.Components.Color
   alias Snake.Components.Direction
+  alias Snake.Components.NextDirection
   alias Snake.Components.Head
   alias Snake.Components.PositionX
   alias Snake.Components.PositionY
@@ -23,6 +24,7 @@ defmodule Snake.Systems.Input do
     BodyPart.add(entity)
     Color.add(entity, 0xDE7749)
     Direction.add(entity, "none")
+    NextDirection.add(entity, "none")
     Head.add(entity)
 
     PositionX.add(entity, 20)
@@ -35,7 +37,6 @@ defmodule Snake.Systems.Input do
 
     Rank.add(entity, 0)
 
-    IO.inspect(System.system_time(:millisecond), label: "System.system_time()")
     TimeOfLastMove.add(entity, System.system_time(:millisecond))
     TimePerMove.add(entity, 500)
   end
@@ -55,12 +56,10 @@ defmodule Snake.Systems.Input do
   defp process_event(_), do: nil
 
   defp set_direction(entity, direction) do
-    if Direction.exists?(entity) do
-      IO.inspect(direction, label: "update")
+    if Direction.get_one(entity) == "none" do
       Direction.update(entity, direction)
-    else
-      IO.inspect(direction, label: "set")
-      Direction.add(entity, direction)
     end
+
+    NextDirection.update(entity, direction)
   end
 end

@@ -1,31 +1,32 @@
 defmodule Snake.Systems.Move do
   @behaviour ECSx.System
 
-  alias Snake.Components.TimePerMove
-  alias Snake.Components.TimeOfLastMove
   alias Snake.Components.BodyPart
   alias Snake.Components.Color
   alias Snake.Components.Direction
   alias Snake.Components.Eaten
   alias Snake.Components.Food
   alias Snake.Components.Head
+  alias Snake.Components.NextDirection
   alias Snake.Components.PositionX
   alias Snake.Components.PositionY
   alias Snake.Components.Primitive
   alias Snake.Components.Rank
+  alias Snake.Components.TimeOfLastMove
+  alias Snake.Components.TimePerMove
+  alias Snake.Components.VisualX
+  alias Snake.Components.VisualY
 
   @impl ECSx.System
   def run do
     case [Head.get_all(), TimeOfLastMove.get_all(), TimePerMove.get_all()] do
       [[head], [{head, time_of_last_move}], [{head, time_per_move}]] ->
         if System.system_time(:millisecond) - time_of_last_move >= time_per_move do
-          IO.inspect("move")
           move(head)
           TimeOfLastMove.update(head, time_of_last_move + time_per_move)
         end
 
       _ ->
-        IO.inspect("not matched")
         :ok
     end
 
@@ -39,8 +40,6 @@ defmodule Snake.Systems.Move do
     direction = Direction.get_one(head)
 
     {new_x, new_y} = Snake.Utils.next_position(head_x, head_y, direction)
-
-    IO.inspect({new_x, new_y, direction}, label: "new_x, new_y")
 
     # move the head
     PositionX.update(head, new_x)
@@ -67,8 +66,11 @@ defmodule Snake.Systems.Move do
       end_x = PositionX.get_one(tail_end)
       end_y = PositionY.get_one(tail_end)
       grow(end_x, end_y, Enum.count(body) + 1)
+      TimePerMove.update(head, max(TimePerMove.get_one(head) - 50, 200))
       eat()
     end
+
+    Direction.update(head, NextDirection.get_one(head))
   end
 
   defp food_on?(x, y) do
@@ -85,6 +87,9 @@ defmodule Snake.Systems.Move do
     entity = Snake.Utils.new_id()
     PositionX.add(entity, x)
     PositionY.add(entity, y)
+    VisualX.add(entity, x * 1.0)
+    VisualY.add(entity, y * 1.0)
+
     Rank.add(entity, rank)
     Primitive.add(entity, "rectangle")
     Color.add(entity, 0xDE3249)
