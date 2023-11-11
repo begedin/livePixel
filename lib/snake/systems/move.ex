@@ -1,6 +1,8 @@
 defmodule Snake.Systems.Move do
   @behaviour ECSx.System
 
+  alias Snake.Components.TimePerMove
+  alias Snake.Components.TimeOfLastMove
   alias Snake.Components.BodyPart
   alias Snake.Components.Color
   alias Snake.Components.Direction
@@ -14,11 +16,16 @@ defmodule Snake.Systems.Move do
 
   @impl ECSx.System
   def run do
-    case Head.get_all() do
-      [head] ->
-        move(head)
+    case [Head.get_all(), TimeOfLastMove.get_all(), TimePerMove.get_all()] do
+      [[head], [{head, time_of_last_move}], [{head, time_per_move}]] ->
+        if System.system_time(:millisecond) - time_of_last_move >= time_per_move do
+          IO.inspect("move")
+          move(head)
+          TimeOfLastMove.update(head, time_of_last_move + time_per_move)
+        end
 
       _ ->
+        IO.inspect("not matched")
         :ok
     end
 
@@ -26,11 +33,14 @@ defmodule Snake.Systems.Move do
   end
 
   defp move(head) do
-    # where the head goes depends on the direction it's facing
+    # these will the determine where the head will go next
     head_x = PositionX.get_one(head)
     head_y = PositionY.get_one(head)
     direction = Direction.get_one(head)
+
     {new_x, new_y} = Snake.Utils.next_position(head_x, head_y, direction)
+
+    IO.inspect({new_x, new_y, direction}, label: "new_x, new_y")
 
     # move the head
     PositionX.update(head, new_x)

@@ -25,21 +25,26 @@ defmodule Snake.Manager do
       Snake.Components.PositionX,
       Snake.Components.PositionY,
       Snake.Components.Primitive,
-      Snake.Components.Rank
+      Snake.Components.Rank,
+      Snake.Components.TimeOfLastMove,
+      Snake.Components.TimePerMove,
+      Snake.Components.VisualX,
+      Snake.Components.VisualY
     ]
   end
 
   def systems do
     [
       Snake.Systems.Move,
+      Snake.Systems.Animation,
       Snake.Systems.Grow,
       Snake.Systems.Input
     ]
   end
 
   def get_world do
-    x_map = Snake.Components.PositionX.get_all() |> Enum.sort()
-    y_map = Snake.Components.PositionY.get_all() |> Enum.sort()
+    x_map = Snake.Components.VisualX.get_all() |> Enum.sort()
+    y_map = Snake.Components.VisualY.get_all() |> Enum.sort()
     shape_map = Snake.Components.Primitive.get_all() |> Enum.sort()
     color_map = Snake.Components.Color.get_all() |> Enum.sort()
 
@@ -52,6 +57,8 @@ defmodule Snake.Manager do
           "x" => x,
           "y" => y,
           "shape" => shape,
+          "width" => 20,
+          "height" => 20,
           "color" => color
         }
       end)

@@ -35,6 +35,7 @@ defmodule LivePixel.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:easing, "~> 0.3.1"},
       {:ecsx, "~> 0.4"},
       {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:floki, ">= 0.30.0", only: :test},

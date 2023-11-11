@@ -5,7 +5,7 @@ defmodule LivePixelWeb.SnakeLive do
     player_id = Snake.Utils.new_id()
 
     if connected?(socket) do
-      Application.put_env(:ecsx, :tick_rate, 4)
+      Application.put_env(:ecsx, :tick_rate, 60)
       Application.put_env(:ecsx, :persist_interval, :timer.seconds(50000))
       Snake.Manager.start_link([])
       ECSx.ClientEvents.add(player_id, :spawn)

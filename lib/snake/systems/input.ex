@@ -6,17 +6,38 @@ defmodule Snake.Systems.Input do
     ECSx.ClientEvents.get_and_clear() |> Enum.each(&process_event/1)
   end
 
+  alias Snake.Components.BodyPart
+  alias Snake.Components.Color
   alias Snake.Components.Direction
+  alias Snake.Components.Head
+  alias Snake.Components.PositionX
+  alias Snake.Components.PositionY
+  alias Snake.Components.Primitive
+  alias Snake.Components.Rank
+  alias Snake.Components.TimeOfLastMove
+  alias Snake.Components.TimePerMove
+  alias Snake.Components.VisualX
+  alias Snake.Components.VisualY
 
   defp process_event({entity, :spawn}) do
-    Snake.Components.PositionX.add(entity, 20)
-    Snake.Components.PositionY.add(entity, 20)
-    Snake.Components.Rank.add(entity, 0)
-    Snake.Components.Direction.add(entity, "none")
-    Snake.Components.Primitive.add(entity, "rectangle")
-    Snake.Components.Color.add(entity, 0xDE7749)
-    Snake.Components.Head.add(entity)
-    Snake.Components.BodyPart.add(entity)
+    BodyPart.add(entity)
+    Color.add(entity, 0xDE7749)
+    Direction.add(entity, "none")
+    Head.add(entity)
+
+    PositionX.add(entity, 20)
+    VisualX.add(entity, 20.0)
+
+    PositionY.add(entity, 20)
+    VisualY.add(entity, 20.0)
+
+    Primitive.add(entity, "rectangle")
+
+    Rank.add(entity, 0)
+
+    IO.inspect(System.system_time(:millisecond), label: "System.system_time()")
+    TimeOfLastMove.add(entity, System.system_time(:millisecond))
+    TimePerMove.add(entity, 500)
   end
 
   @arrow_keys ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]
@@ -35,8 +56,10 @@ defmodule Snake.Systems.Input do
 
   defp set_direction(entity, direction) do
     if Direction.exists?(entity) do
+      IO.inspect(direction, label: "update")
       Direction.update(entity, direction)
     else
+      IO.inspect(direction, label: "set")
       Direction.add(entity, direction)
     end
   end
