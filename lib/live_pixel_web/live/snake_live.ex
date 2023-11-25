@@ -1,32 +1,76 @@
 defmodule LivePixelWeb.SnakeLive do
   use LivePixelWeb, :live_view
 
-  def mount(_, _, socket) do
-    player_id = Snake.Utils.new_id()
+  alias Snake.Game
+  alias Snake.Controller
 
+  require Logger
+
+  def mount(_, _, socket) do
     if connected?(socket) do
-      Application.put_env(:ecsx, :tick_rate, 60)
-      Application.put_env(:ecsx, :persist_interval, :timer.seconds(50000))
-      Snake.Manager.start_link([])
-      ECSx.ClientEvents.add(player_id, :spawn)
-      :timer.send_interval(floor(1000 / 60), :send_update)
+      :timer.send_interval(floor(1000 / 60), :draw)
+      send(self(), :update)
     end
 
-    {:ok, assign(socket, page_title: "Snake", player_id: player_id)}
+    socket = assign(socket, page_title: "Snake", game_state: Game.spawn_player(%{}))
+
+    {:ok, socket}
   end
 
   def render(assigns) do
     ~H"""
-    <div tabindex="0" phx-hook="pixi" id="game" phx-keydown="keydown" phx-target="#game" />
+    <div class="relative h-full w-full flex place-items-center">
+      <div
+        class="h-full w-full flex place-items-center justify-center"
+        tabindex="0"
+        phx-hook="pixi"
+        id="game"
+        phx-window-keydown="keydown"
+        phx-target="#game"
+        phx-update="ignore"
+      ></div>
+      <div
+        :if={Game.game_over?(@game_state)}
+        class="absolute w-full h-full bg-red/50 grid text-xl place-items-center">
+          <div>Game Over</div>
+          <button phx-click="new_game">Try again</button>
+        </div>
+      <div
+        :if={Game.paused?(@game_state)}
+        class="absolute w-full h-full bg-black/50 grid text-xl place-items-center">Pause (hit "Space" to continue)</div>
+    </div>
     """
   end
 
   def handle_event("keydown", %{"key" => key}, socket) do
-    ECSx.ClientEvents.add(socket.assigns.player_id, {:keydown, key})
-    {:noreply, socket}
+    state = Controller.run(socket.assigns.game_state, {:keydown, key})
+    {:noreply, assign(socket, :game_state, state)}
   end
 
-  def handle_info(:send_update, socket) do
-    {:noreply, push_event(socket, "update", %{world: Snake.Manager.get_world()})}
+  def handle_event("new_game", _, socket) do
+    state = Game.spawn_player(%{})
+    {:noreply, assign(socket, :game_state, state)}
+  end
+
+  def handle_info(:draw, socket) do
+    {:noreply, push_event(socket, "world", %{world: Game.render(socket.assigns.game_state)})}
+  end
+
+  def handle_info(:update, socket) do
+    state =
+      if Game.playing?(socket.assigns.game_state) do
+        socket.assigns.game_state
+        |> Snake.Systems.Movement.run()
+        |> Snake.Systems.Animation.run()
+        |> Snake.Systems.Collision.run()
+        |> Snake.Systems.FoodEating.run()
+        |> Snake.Systems.FoodSpawning.run()
+      else
+        socket.assigns.game_state
+      end
+
+    send(self(), :update)
+
+    {:noreply, assign(socket, :game_state, state)}
   end
 end

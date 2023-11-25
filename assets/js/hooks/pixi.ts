@@ -14,7 +14,7 @@ type Hook = {
   el: HTMLDivElement;
   mounted: () => void | Promise<void>;
   handleEvent: (
-    name: "update",
+    name: "world",
     callback: (data: { world: World }) => void
   ) => void;
 };
@@ -26,11 +26,7 @@ export const pixi: Hook = {
       width: 800,
       background: "#1099bb",
     });
-    this.el.style.display = "flex";
-    this.el.style.justifyContent = "center";
-    this.el.style.alignItems = "center";
-    this.el.style.height = "100vh";
-    this.el.style.width = "100vw";
+
     if (app.view.style) {
       app.view.style.width = "min(100%, 100vh)";
     }
@@ -39,7 +35,17 @@ export const pixi: Hook = {
 
     const entities = new Map<string, PIXI.Graphics>();
 
-    this.handleEvent("update", ({ world }) => {
+    this.handleEvent("world", (payload) => {
+      const { world } = payload;
+      const entityIds = new Set(world.map(({ id }) => id));
+
+      entities.forEach((graphic, id) => {
+        if (!entityIds.has(id)) {
+          app.stage.removeChild(graphic);
+          entities.delete(id);
+        }
+      });
+
       world.forEach(({ id, x, y, width, height, shape, color }) => {
         const entity = entities.get(id) || new PIXI.Graphics();
         if (!entities.has(id)) {

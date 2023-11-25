@@ -1,74 +1,58 @@
 defmodule Snake.Systems.Animation do
-  @behaviour ECSx.System
+  alias Snake.Game
 
-  alias Snake.Components.BodyPart
-  alias Snake.Components.Direction
-  alias Snake.Components.Head
-  alias Snake.Components.PositionX
-  alias Snake.Components.PositionY
-  alias Snake.Components.Rank
-  alias Snake.Components.TimeOfLastMove
-  alias Snake.Components.TimePerMove
-  alias Snake.Components.VisualX
-  alias Snake.Components.VisualY
-
-  @impl ECSx.System
-  def run do
-    case [Head.get_all(), TimeOfLastMove.get_all(), TimePerMove.get_all()] do
-      [[head], [{head, time_of_last_move}], [{head, time_per_move}]] ->
-        animate(head, time_of_last_move, time_per_move)
-
-      _ ->
-        :ok
+  def run(state) do
+    with [{_, "playing"}] <- Game.get_all_components(state, :game_state),
+         [{head, true}] <- Game.get_all_components(state, :head),
+         [{_head, time_of_last_move}] <- Game.get_all_components(state, :time_of_last_move),
+         [{_head, time_per_move}] <- Game.get_all_components(state, :time_per_move) do
+      animate(state, head, time_of_last_move, time_per_move)
+    else
+      _ -> state
     end
-
-    :ok
   end
 
-  defp animate(head_id, time_of_last_move, time_per_move) do
-    head_x = PositionX.get_one(head_id)
-    head_y = PositionY.get_one(head_id)
+  defp animate(state, head_id, time_of_last_move, time_per_move) do
+    head_x = Game.get_component(state, :position_x, head_id)
+    head_y = Game.get_component(state, :position_y, head_id)
 
-    direction = Direction.get_one(head_id)
+    direction = Game.get_component(state, :direction, head_id)
 
     {next_x, next_y} = Snake.Utils.next_position(head_x, head_y, direction)
 
     now = System.system_time(:millisecond)
-    time_since_move = now - time_of_last_move
+    time_since_move = min(now - time_of_last_move, time_per_move)
 
-    update_visual_position(
-      head_id,
-      interpolate(head_x, next_x, time_since_move, time_per_move),
-      interpolate(head_y, next_y, time_since_move, time_per_move)
-    )
+    body_ids =
+      state
+      |> Game.get_all_components(:ranked_body_part)
+      |> Enum.sort_by(&elem(&1, 1))
+      |> Enum.map(&elem(&1, 0))
 
-    # all body parts except the head, sorted by position from head to tail
-    body = BodyPart.get_all() |> List.delete(head_id) |> Enum.sort_by(&Rank.get_one/1)
+    # animate the body - every body part is interpolated to the position of the one in front
+    # for the head, we pass in next_x and next_y as initial arguments
+    body_ids
+    |> Enum.reduce({state, {next_x, next_y}}, fn part, {state, {prev_x, prev_y}} ->
+      part_x = Game.get_component(state, :position_x, part)
+      part_y = Game.get_component(state, :position_y, part)
 
-    # move the body - every body part is moved to the position of the previous one
-    Enum.reduce(body, {head_x, head_y}, fn part, {prev_x, prev_y} ->
-      part_x = PositionX.get_one(part)
-      part_y = PositionY.get_one(part)
+      visual_x = interpolate(part_x, prev_x, time_since_move, time_per_move)
+      visual_y = interpolate(part_y, prev_y, time_since_move, time_per_move)
 
-      update_visual_position(
-        part,
-        interpolate(part_x, prev_x, time_since_move, time_per_move),
-        interpolate(part_y, prev_y, time_since_move, time_per_move)
-      )
+      state =
+        state
+        |> Game.set_component(part, :visual_x, visual_x)
+        |> Game.set_component(part, :visual_y, visual_y)
 
-      {part_x, part_y}
+      {state, {part_x, part_y}}
     end)
-  end
-
-  defp update_visual_position(id, visual_x, visual_y) do
-    VisualX.update(id, visual_x)
-    VisualY.update(id, visual_y)
+    |> elem(0)
   end
 
   defp interpolate(current, next, time_since_move, time_per_move) do
     progress = time_since_move * 1.0 / time_per_move
     eased_progress = Easing.cubic_in_out(progress)
     distance = next - current
-    current + distance * eased_progress
+    current + min(distance * eased_progress, 1.0)
   end
 end
