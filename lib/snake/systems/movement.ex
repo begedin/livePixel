@@ -29,6 +29,7 @@ defmodule Snake.Systems.Movement do
 
     # move the head
     state
+    |> Game.set_component(head, :sound, "move")
     |> move_body(head)
     |> eat_and_grow(head, tail_rank, tail_x, tail_y)
     |> change_direction(head)
@@ -68,6 +69,7 @@ defmodule Snake.Systems.Movement do
       state
       |> grow(tail_rank, tail_x, tail_y)
       |> Game.set_component(head, :time_per_move, time_per_move)
+      |> Game.set_component(head, :sound, "eat")
       |> eat()
     else
       state

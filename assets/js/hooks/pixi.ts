@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import { Howl } from "howler";
 
 type World = {
   id: string;
@@ -15,7 +16,7 @@ type Hook = {
   mounted: () => void | Promise<void>;
   handleEvent: (
     name: "world",
-    callback: (data: { world: World }) => void
+    callback: (data: { world: World; sound: "eat" | "move" }) => void
   ) => void;
 };
 
@@ -27,17 +28,26 @@ export const pixi: Hook = {
       background: "#1099bb",
     });
 
-    if (app.view.style) {
-      app.view.style.width = "min(100%, 100vh)";
-    }
+    const move = await new Howl({ src: ["/sounds/move.wav"] }).load();
+    const eat = await new Howl({ src: ["/sounds/eat.wav"] }).load();
+
+    const sounds = {
+      move,
+      eat,
+    };
 
     this.el.appendChild(app.view as unknown as Element);
 
     const entities = new Map<string, PIXI.Graphics>();
 
     this.handleEvent("world", (payload) => {
-      const { world } = payload;
+      const { world, sound } = payload;
       const entityIds = new Set(world.map(({ id }) => id));
+
+      if (sound) {
+        console.error("!SOUND!");
+        sounds[sound].play();
+      }
 
       entities.forEach((graphic, id) => {
         if (!entityIds.has(id)) {

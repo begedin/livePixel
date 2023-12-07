@@ -1,4 +1,23 @@
 defmodule Snake.Game do
+  @components [
+    :color,
+    :direction,
+    :eaten,
+    :food,
+    :game_state,
+    :head,
+    :next_direction,
+    :position_x,
+    :position_y,
+    :primitive,
+    :ranked_body_part,
+    :time_of_last_move,
+    :time_per_move,
+    :visual_x,
+    :visual_y,
+    :sound
+  ]
+
   def spawn_player(%{} = state) do
     id =
       case get_all_components(state, :head) do
@@ -63,27 +82,45 @@ defmodule Snake.Game do
     end
   end
 
-  def set_component(%{} = state, entity, type, data) when is_binary(entity) and is_atom(type) do
+  def set_component(%{} = state, entity, type, data)
+      when is_binary(entity) and type in @components do
     Map.update(state, type, %{entity => data}, &Map.put(&1, entity, data))
   end
 
-  def get_all_components(%{} = state, type) when is_atom(type) do
+  @spec get_all_components(map(), atom()) :: list({map, any})
+  def get_all_components(%{} = state, type) when type in @components do
     state |> Map.get(type, %{}) |> Map.to_list()
   end
 
-  def get_component(%{} = state, type, entity) when is_atom(type) and is_binary(entity) do
+  def get_component(%{} = state, type, entity) when type in @components and is_binary(entity) do
     state |> Map.fetch!(type) |> Map.fetch!(entity)
   end
 
-  def remove_component(%{} = state, entity, type) when is_atom(type) and is_binary(entity) do
+  def remove_component(%{} = state, entity, type)
+      when type in @components and is_binary(entity) do
     Map.update(state, type, %{}, &Map.delete(&1, entity))
   end
 
   def render(%{} = state) do
-    x_map = get_all_components(state, :visual_x) |> Enum.sort()
-    y_map = get_all_components(state, :visual_y) |> Enum.sort()
-    shape_map = get_all_components(state, :primitive) |> Enum.sort()
-    color_map = get_all_components(state, :color) |> Enum.sort()
+    sound =
+      case get_all_components(state, :sound) do
+        [] -> nil
+        [{_head_id, sound}] -> sound
+      end
+
+    IO.inspect(sound, label: "sound")
+
+    %{
+      world: render_world(state),
+      sound: sound
+    }
+  end
+
+  defp render_world(state) do
+    x_map = state |> get_all_components(:visual_x) |> Enum.sort()
+    y_map = state |> get_all_components(:visual_y) |> Enum.sort()
+    shape_map = state |> get_all_components(:primitive) |> Enum.sort()
+    color_map = state |> get_all_components(:color) |> Enum.sort()
 
     snake =
       [x_map, y_map, shape_map, color_map]

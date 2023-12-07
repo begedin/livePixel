@@ -53,7 +53,14 @@ defmodule LivePixelWeb.SnakeLive do
   end
 
   def handle_info(:draw, socket) do
-    {:noreply, push_event(socket, "world", %{world: Game.render(socket.assigns.game_state)})}
+    game_state = Snake.Systems.SoundCleanup.run(socket.assigns.game_state)
+
+    socket =
+      socket
+      |> push_event("world", Game.render(socket.assigns.game_state))
+      |> assign(:game_state, game_state)
+
+    {:noreply, socket}
   end
 
   def handle_info(:update, socket) do

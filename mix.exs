@@ -1,6 +1,6 @@
 defmodule LivePixel.MixProject do
   @moduledoc """
-  A collection of game dev demos with ecsx and pixi.js via phoenix live view.
+  A collection of game dev demos with ECS and pixi.js via phoenix live view.
   """
   use Mix.Project
 
