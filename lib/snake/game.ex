@@ -170,4 +170,8 @@ defmodule Snake.Game do
       }
     }
   end
+
+  def score(state) do
+    state |> get_all_components(:ranked_body_part) |> Enum.count() |> Kernel.-(1)
+  end
 end

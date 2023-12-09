@@ -37,8 +37,11 @@ export const pixi: Hook = {
     let app: PIXI.Application;
 
     this.handleEvent("setup", ({ width, height, background }) => {
-      app = new PIXI.Application({ height, width, background });
-      this.el.appendChild(app.view as HTMLCanvasElement);
+      app = app || new PIXI.Application({ height, width, background });
+      const canvas = app.view as HTMLCanvasElement;
+      canvas.style.maxHeight = "100%";
+      canvas.style.maxWidth = "100%";
+      this.el.contains(canvas) || this.el.appendChild(canvas);
     });
 
     const sounds: Record<string, Howl> = {};

@@ -21,6 +21,7 @@ defmodule Snake.Controller do
     case Game.get_all_components(state, :game_state) do
       [{player_id, "playing"}] -> Game.set_component(state, player_id, :game_state, "pause")
       [{player_id, "pause"}] -> Game.set_component(state, player_id, :game_state, "playing")
+      _ -> state
     end
   end
 

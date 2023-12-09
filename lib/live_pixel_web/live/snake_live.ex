@@ -14,7 +14,7 @@ defmodule LivePixelWeb.SnakeLive do
 
     socket =
       socket
-      |> assign(page_title: "Snake", game_state: Game.spawn_player(%{}))
+      |> assign(page_title: "Snake", game_state: Game.spawn_player(%{}), score: 0)
       |> push_event("setup", Game.config())
       |> push_event("assets", Game.assets())
 
@@ -23,25 +23,34 @@ defmodule LivePixelWeb.SnakeLive do
 
   def render(assigns) do
     ~H"""
-    <div class="relative h-full w-full flex place-items-center">
+    <div class="h-full w-full flex place-items-center justify-center">
+      <div class="relative flex max-w-full max-h-full items-center justify-center aspect-square">
+
       <div
-        class="h-full w-full flex place-items-center justify-center"
+        class="flex place-items-center justify-center aspect-square"
         tabindex="0"
         phx-hook="pixi"
         id="game"
         phx-window-keydown="keydown"
         phx-target="#game"
         phx-update="ignore"
-      ></div>
+      >
+      </div>
       <div
         :if={Game.game_over?(@game_state)}
-        class="absolute w-full h-full bg-red/50 grid text-xl place-items-center">
+        class="absolute w-full h-full bg-red-600/50 grid text-white text-xl place-items-center">
           <div>Game Over</div>
           <button phx-click="new_game">Try again</button>
         </div>
       <div
         :if={Game.paused?(@game_state)}
-        class="absolute w-full h-full bg-black/50 grid text-xl place-items-center">Pause (hit "Space" to continue)</div>
+        class="absolute w-full h-full bg-white/50 grid text-xl place-items-center">
+        Pause (hit "Space" to continue)
+      </div>
+      <div class="absolute top-0 right-0 p-4 text-white text-xl">
+        <div><%= @score %></div>
+      </div>
+      </div>
     </div>
     """
   end
@@ -82,6 +91,6 @@ defmodule LivePixelWeb.SnakeLive do
 
     send(self(), :update)
 
-    {:noreply, assign(socket, :game_state, state)}
+    {:noreply, assign(socket, game_state: state, score: Game.score(state))}
   end
 end
