@@ -1,6 +1,12 @@
 import * as PIXI from "pixi.js";
 import { Howl } from "howler";
 
+type Config = {
+  width: number;
+  height: number;
+  background: string;
+};
+
 type State = {
   world: {
     id: string;
@@ -20,6 +26,7 @@ type Hook = {
   el: HTMLDivElement;
   mounted: () => Promise<void>;
   handleEvent: {
+    (name: "setup", callback: (data: Config) => void): void;
     (name: "state", callback: (data: State) => void): void;
     (name: "assets", callback: (data: Assets) => void): void;
   };
@@ -27,17 +34,14 @@ type Hook = {
 
 export const pixi: Hook = {
   async mounted() {
-    const app = new PIXI.Application({
-      height: 800,
-      width: 800,
-      background: "#1099bb",
+    let app: PIXI.Application;
+
+    this.handleEvent("setup", ({ width, height, background }) => {
+      app = new PIXI.Application({ height, width, background });
+      this.el.appendChild(app.view as HTMLCanvasElement);
     });
 
     const sounds: Record<string, Howl> = {};
-
-    this.el.appendChild(app.view as unknown as Element);
-
-    const entities = new Map<string, PIXI.Graphics>();
 
     this.handleEvent("assets", (assets) => {
       Object.entries(assets.sounds).forEach(([key, path]) => {
@@ -45,7 +49,12 @@ export const pixi: Hook = {
       });
     });
 
+    const entities = new Map<string, PIXI.Graphics>();
+
     this.handleEvent("state", ({ world, sound }) => {
+      if (!app) {
+        return;
+      }
       const entityIds = new Set(world.map(({ id }) => id));
 
       sound && sounds[sound].play();

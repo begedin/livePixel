@@ -154,6 +154,14 @@ defmodule Snake.Game do
     end
   end
 
+  def config do
+    %{
+      width: 800,
+      height: 800,
+      background: "#000000"
+    }
+  end
+
   def assets do
     %{
       sounds: %{

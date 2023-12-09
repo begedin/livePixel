@@ -15,6 +15,7 @@ defmodule LivePixelWeb.SnakeLive do
     socket =
       socket
       |> assign(page_title: "Snake", game_state: Game.spawn_player(%{}))
+      |> push_event("setup", Game.config())
       |> push_event("assets", Game.assets())
 
     {:ok, socket}
