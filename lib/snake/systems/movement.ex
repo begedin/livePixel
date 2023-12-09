@@ -29,7 +29,6 @@ defmodule Snake.Systems.Movement do
 
     # move the head
     state
-    |> Game.set_component(head, :sound, "move")
     |> move_body(head)
     |> eat_and_grow(head, tail_rank, tail_x, tail_y)
     |> change_direction(head)
@@ -58,7 +57,14 @@ defmodule Snake.Systems.Movement do
       {state, {x, y}}
     end)
     |> elem(0)
+    |> maybe_play_sound(head, direction)
   end
+
+  defp maybe_play_sound(state, head, direction) when direction != "none" do
+    Game.set_component(state, head, :sound, "move")
+  end
+
+  defp maybe_play_sound(state, _head, _direction), do: state
 
   defp eat_and_grow(state, head, tail_rank, tail_x, tail_y) do
     # if the head has touched food, grow the snake by putting a new part at
