@@ -1,23 +1,28 @@
 import * as PIXI from "pixi.js";
 import { Howl } from "howler";
 
-type World = {
-  id: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  shape: "rectangle";
-  color: number;
-}[];
+type State = {
+  world: {
+    id: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    shape: "rectangle";
+    color: number;
+  }[];
+  sound: string;
+};
+
+type Assets = { sounds: Record<string, string> };
 
 type Hook = {
   el: HTMLDivElement;
-  mounted: () => void | Promise<void>;
-  handleEvent: (
-    name: "world",
-    callback: (data: { world: World; sound: "eat" | "move" }) => void
-  ) => void;
+  mounted: () => Promise<void>;
+  handleEvent: {
+    (name: "state", callback: (data: State) => void): void;
+    (name: "assets", callback: (data: Assets) => void): void;
+  };
 };
 
 export const pixi: Hook = {
@@ -28,26 +33,22 @@ export const pixi: Hook = {
       background: "#1099bb",
     });
 
-    const move = await new Howl({ src: ["/sounds/move.wav"] }).load();
-    const eat = await new Howl({ src: ["/sounds/eat.wav"] }).load();
-
-    const sounds = {
-      move,
-      eat,
-    };
+    const sounds: Record<string, Howl> = {};
 
     this.el.appendChild(app.view as unknown as Element);
 
     const entities = new Map<string, PIXI.Graphics>();
 
-    this.handleEvent("world", (payload) => {
-      const { world, sound } = payload;
+    this.handleEvent("assets", (assets) => {
+      Object.entries(assets.sounds).forEach(([key, path]) => {
+        sounds[key] = new Howl({ src: [path] });
+      });
+    });
+
+    this.handleEvent("state", ({ world, sound }) => {
       const entityIds = new Set(world.map(({ id }) => id));
 
-      if (sound) {
-        console.error("!SOUND!");
-        sounds[sound].play();
-      }
+      sound && sounds[sound].play();
 
       entities.forEach((graphic, id) => {
         if (!entityIds.has(id)) {

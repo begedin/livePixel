@@ -12,7 +12,10 @@ defmodule LivePixelWeb.SnakeLive do
       send(self(), :update)
     end
 
-    socket = assign(socket, page_title: "Snake", game_state: Game.spawn_player(%{}))
+    socket =
+      socket
+      |> assign(page_title: "Snake", game_state: Game.spawn_player(%{}))
+      |> push_event("assets", Game.assets())
 
     {:ok, socket}
   end
@@ -57,7 +60,7 @@ defmodule LivePixelWeb.SnakeLive do
 
     socket =
       socket
-      |> push_event("world", Game.render(socket.assigns.game_state))
+      |> push_event("state", Game.render(socket.assigns.game_state))
       |> assign(:game_state, game_state)
 
     {:noreply, socket}

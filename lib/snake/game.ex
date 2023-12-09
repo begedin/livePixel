@@ -108,8 +108,6 @@ defmodule Snake.Game do
         [{_head_id, sound}] -> sound
       end
 
-    IO.inspect(sound, label: "sound")
-
     %{
       world: render_world(state),
       sound: sound
@@ -154,5 +152,14 @@ defmodule Snake.Game do
         food_shape = get_component(state, :primitive, food_id)
         %{"id" => food_id, "x" => food_x, "y" => food_y, "shape" => food_shape}
     end
+  end
+
+  def assets do
+    %{
+      sounds: %{
+        eat: "/sounds/eat.wav",
+        move: "/sounds/move.wav"
+      }
+    }
   end
 end
