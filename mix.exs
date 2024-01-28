@@ -41,7 +41,7 @@ defmodule LivePixel.MixProject do
       {:jason, "~> 1.2"},
       {:phoenix_live_dashboard, "~> 0.8.0"},
       {:phoenix_live_reload, "~> 1.4.1", only: :dev},
-      {:phoenix_live_view, "~> 0.19.5"},
+      {:phoenix_live_view, "~> 0.20.0"},
       {:phoenix, "~> 1.7.1"},
       {:plug_cowboy, "~> 2.5"},
       {:tailwind, "~> 0.2.1", runtime: Mix.env() == :dev},
