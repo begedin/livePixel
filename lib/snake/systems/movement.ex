@@ -70,7 +70,7 @@ defmodule Snake.Systems.Movement do
     # if the head has touched food, grow the snake by putting a new part at
     # the old tail position
     if food_on?(state, head) do
-      time_per_move = max(Game.get_component(state, :time_per_move, head) - 50, 100)
+      time_per_move = max(Game.get_component(state, :time_per_move, head) - 50, 75)
 
       state
       |> grow(tail_rank, tail_x, tail_y)

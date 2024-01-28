@@ -165,8 +165,9 @@ defmodule Snake.Game do
   def assets do
     %{
       sounds: %{
-        eat: "/sounds/eat.wav",
-        move: "/sounds/move.wav"
+        eat: "/sounds/eat.mp3",
+        game_over: "/sounds/game_over.mp3",
+        move: "/sounds/move.mp3"
       }
     }
   end

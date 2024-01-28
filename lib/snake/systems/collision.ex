@@ -32,6 +32,9 @@ defmodule Snake.Systems.Collision do
 
   defp game_over(state) do
     [{head, true}] = Game.get_all_components(state, :head)
-    Game.set_component(state, head, :game_state, "game_over")
+
+    state
+    |> Game.set_component(head, :game_state, "game_over")
+    |> Game.set_component(head, :sound, "game_over")
   end
 end
