@@ -122,7 +122,6 @@ defmodule Snake.Game do
 
     snake =
       [x_map, y_map, shape_map, color_map]
-      |> IO.inspect()
       |> Enum.zip()
       |> Enum.map(fn {{id, x}, {id, y}, {id, shape}, {id, color}} ->
         %{
