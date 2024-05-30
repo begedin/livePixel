@@ -3,7 +3,9 @@ defmodule LivePixelWeb.DemosLive do
 
   def render(assigns) do
     ~H"""
-    <.link navigate={~p"/snake"}>Snake</.link>
+    <div class="w-full h-full flex items-center justify-center">
+      <.link class="p-8 text-xl bg-emerald-200 hover:bg-emerald-300 transition-colors flex rounded-md" navigate={~p"/snake"}>Snake</.link>
+    </div>
     """
   end
 end

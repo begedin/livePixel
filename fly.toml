@@ -10,7 +10,7 @@ kill_signal = 'SIGTERM'
 [build]
 
 [env]
-  PHX_HOST = 'livepixel.fly.dev'
+  PHX_HOST = 'livepixel.bego.dev'
   PORT = '8080'
 
 [http_service]
