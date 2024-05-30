@@ -122,6 +122,7 @@ defmodule Snake.Game do
 
     snake =
       [x_map, y_map, shape_map, color_map]
+      |> IO.inspect()
       |> Enum.zip()
       |> Enum.map(fn {{id, x}, {id, y}, {id, shape}, {id, color}} ->
         %{
@@ -150,7 +151,17 @@ defmodule Snake.Game do
         food_x = get_component(state, :position_x, food_id)
         food_y = get_component(state, :position_y, food_id)
         food_shape = get_component(state, :primitive, food_id)
-        %{"id" => food_id, "x" => food_x, "y" => food_y, "shape" => food_shape}
+        food_color = get_component(state, :color, food_id)
+
+        %{
+          "id" => food_id,
+          "x" => food_x,
+          "y" => food_y,
+          "width" => 20,
+          "height" => 20,
+          "shape" => food_shape,
+          "color" => food_color
+        }
     end
   end
 

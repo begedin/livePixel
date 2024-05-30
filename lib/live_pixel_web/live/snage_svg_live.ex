@@ -1,4 +1,4 @@
-defmodule LivePixelWeb.SnakeLive do
+defmodule LivePixelWeb.SnakeSVGLive do
   use LivePixelWeb, :live_view
 
   alias Snake.Game
@@ -15,28 +15,46 @@ defmodule LivePixelWeb.SnakeLive do
     socket =
       socket
       |> assign(page_title: "Snake", game_state: Game.spawn_player(%{}), score: 0)
-      |> push_event("setup", Game.config())
       |> push_event("assets", Game.assets())
 
     {:ok, socket}
   end
 
   def render(assigns) do
+    config = Game.config()
+
+    assigns =
+      assign(
+        assigns,
+        game_state: Game.render(assigns.game_state),
+        game_width: config.width,
+        game_height: config.height
+      )
+
     ~H"""
     <div class="h-full w-full flex place-items-center justify-center">
       <div class="relative flex max-w-full max-h-full items-center justify-center aspect-square">
 
       <div
-        class="flex place-items-center justify-center aspect-square"
+        class="flex place-items-center justify-center aspect-square w-full h-full"
         tabindex="0"
-        phx-hook="pixi"
         id="game"
         phx-window-keydown="keydown"
         phx-target="#game"
-        phx-update="ignore"
+        phx-hook="howler"
       >
+        <svg
+          class="w-[800px] h-[800px] bg-black"
+          viewBox={"0 0 #{@game_width} #{@game_height}"}
+        >
+          <rect
+            :for={entity <- @game_state.world}
+            x={entity["x"] * entity["width"]} y={entity["y"] * entity["height"]}
+            width={entity["width"]} height={entity["height"]}
+            fill={"##{Integer.to_string(entity["color"], 16)}"} />
+          />
+        </svg>
       </div>
-      <div phx-hook="howler" id="sound" class="display-none" ></div>
       <div
         :if={Game.game_over?(@game_state)}
         class="absolute w-full h-full bg-red-600/50 grid text-white text-xl place-items-center">

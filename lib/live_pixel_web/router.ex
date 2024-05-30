@@ -14,6 +14,7 @@ defmodule LivePixelWeb.Router do
     pipe_through [:browser]
     live("/", DemosLive)
     live("/snake", SnakeLive)
+    live("/snake-svg", SnakeSVGLive)
   end
 
   # Enable LiveDashboard in development
