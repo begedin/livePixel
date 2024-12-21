@@ -24,7 +24,9 @@ config :esbuild,
     args:
       ~w(js/app.ts --bundle --target=es2022 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),
     cd: Path.expand("../assets", __DIR__),
-    env: %{"NODE_PATH" => Path.expand("../deps", __DIR__) <> ":" <> Path.join(__DIR__, "node_modules")}
+    env: %{
+      "NODE_PATH" => Path.expand("../deps", __DIR__) <> ":" <> Path.join(__DIR__, "node_modules")
+    }
   ]
 
 # Configure tailwind (the version is required)

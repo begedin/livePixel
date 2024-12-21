@@ -49,7 +49,7 @@ defmodule LivePixelWeb.SnakeLive do
         Pause (hit "Space" to continue)
       </div>
       <div class="absolute top-0 right-0 p-4 text-white text-xl">
-        <div><%= @score %></div>
+        <div>{@score}</div>
       </div>
       </div>
     </div>

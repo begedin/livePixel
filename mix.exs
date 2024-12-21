@@ -35,13 +35,14 @@ defmodule LivePixel.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:easing, "~> 0.3.1"},
       {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:floki, ">= 0.36.0", only: :test},
       {:jason, "~> 1.4.0"},
       {:phoenix_live_dashboard, "~> 0.8.0"},
       {:phoenix_live_reload, "~> 1.5.3", only: :dev},
-      {:phoenix_live_view, "~> 0.20.14"},
+      {:phoenix_live_view, "~> 1.0"},
       {:phoenix, "~> 1.7.12"},
       {:plug_cowboy, "~> 2.5"},
       {:tailwind, "~> 0.2.1", runtime: Mix.env() == :dev},

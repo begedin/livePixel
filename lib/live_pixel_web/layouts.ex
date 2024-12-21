@@ -11,7 +11,7 @@ defmodule LivePixelWeb.Layouts do
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="csrf-token" content={get_csrf_token()} />
         <.live_title suffix=" · LivePixelWeb">
-          <%= assigns[:page_title] || "Demo" %>
+          {assigns[:page_title] || "Demo"}
         </.live_title>
 
         <link rel="stylesheet" href={~p"/assets/app.css"} />
@@ -19,15 +19,13 @@ defmodule LivePixelWeb.Layouts do
         </script>
       </head>
       <body class="bg-neutral-200">
-        <%= @inner_content %>
+        {@inner_content}
       </body>
     </html>
     """
   end
 
   def render("live.html", assigns) do
-    ~H"""
-    <%= @inner_content %>
-    """
+    ~H"{@inner_content}"
   end
 end
