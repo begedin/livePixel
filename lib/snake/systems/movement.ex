@@ -104,7 +104,7 @@ defmodule Snake.Systems.Movement do
     |> Game.set_component(entity, :visual_x, x * 1.0)
     |> Game.set_component(entity, :visual_y, y * 1.0)
     |> Game.set_component(entity, :primitive, "rectangle")
-    |> Game.set_component(entity, :color, 0xDE3249)
+    |> Game.set_component(entity, :color, %{r: 222, g: 50, b: 73})
     |> Game.set_component(entity, :ranked_body_part, tail_rank + 1)
   end
 

@@ -14,7 +14,7 @@ defmodule Snake.Systems.FoodSpawning do
     y = Enum.random(0..39)
 
     state
-    |> Game.set_component(entity, :color, 0xC34288)
+    |> Game.set_component(entity, :color, %{r: 195, g: 66, b: 136})
     |> Game.set_component(entity, :primitive, "rectangle")
     |> Game.set_component(entity, :food, true)
     |> Game.set_component(entity, :position_x, x)

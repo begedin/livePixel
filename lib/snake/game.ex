@@ -38,7 +38,7 @@ defmodule Snake.Game do
     |> set_component(id, :direction, "none")
     |> set_component(id, :next_direction, "none")
     |> set_component(id, :head, true)
-    |> set_component(id, :color, 0xDE7749)
+    |> set_component(id, :color, %{r: 222, g: 119, b: 73})
   end
 
   def spawn_food(%{} = state) do
@@ -58,7 +58,7 @@ defmodule Snake.Game do
     |> set_component(id, :visual_y, y * 1.0)
     |> set_component(id, :primitive, "rectangle")
     |> set_component(id, :food, true)
-    |> set_component(id, :color, 0xC34288)
+    |> set_component(id, :color, %{r: 195, g: 66, b: 136})
   end
 
   def paused?(%{} = state) do

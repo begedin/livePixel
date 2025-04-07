@@ -1,23 +1,22 @@
 export type Config = {
+  width: number;
+  height: number;
+  background: string;
+};
+
+export type State = {
+  world: {
+    id: string;
+    x: number;
+    y: number;
     width: number;
     height: number;
-    background: string;
-  };
-  
-export type State = {
-    world: {
-      id: string;
-      x: number;
-      y: number;
-      width: number;
-      height: number;
-      shape: "rectangle";
-      color: number;
-    }[];
-    sound: string;
-  };
+    shape: "rectangle";
+    color: { r: number; g: number; b: number };
+  }[];
+  sound: string;
+};
 
-  
 export type Assets = { sounds: Record<string, string> };
 
 export type Hook = {
