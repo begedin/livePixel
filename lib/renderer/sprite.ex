@@ -8,22 +8,18 @@ defmodule Renderer.Sprite do
   defstruct [:shader, :quadVAO]
 
   def new(shader) do
-    %__MODULE__{
-      shader: shader
-    }
-    |> init_render_data()
+    init_render_data(%__MODULE__{shader: shader})
   end
 
   def draw(
         # %__MODULE__{shader: shader} = sprite,
-        %{sprite_renderer: %{shader: shader} = sprite, resources: resources} = _state,
+        %{sprite_renderer: %{shader: shader} = sprite} = _state,
         texture,
         {x, y} = _position,
         {width, height} = _size,
         rotate,
         color
       ) do
-    texture = resources.textures[texture]
     Shader.use_shader(shader)
 
     model =

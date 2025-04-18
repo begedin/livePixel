@@ -13,8 +13,6 @@ defmodule Snake.Controller do
   }
 
   def run(%{} = state, {:keydown, k}) when k in @arrow_keys do
-    Logger.debug("keydown: #{k}")
-
     case Game.get_all_components(state, :game_state) do
       [{player_id, "playing"}] -> set_direction(state, player_id, @direction[k])
       _ -> state
@@ -22,8 +20,6 @@ defmodule Snake.Controller do
   end
 
   def run(%{} = state, {:keydown, " "}) do
-    Logger.debug("keydown: space")
-
     case Game.get_all_components(state, :game_state) do
       [{player_id, "playing"}] -> Game.set_component(state, player_id, :game_state, "pause")
       [{player_id, "pause"}] -> Game.set_component(state, player_id, :game_state, "playing")
