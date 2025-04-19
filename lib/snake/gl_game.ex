@@ -115,7 +115,7 @@ defmodule Snake.GLGame do
   @impl :wx_object
   def terminate(reason, state) do
     Logger.error(msg: reason)
-    Supervisor.stop(GLGame.Supervisor)
+    System.halt(0)
 
     {:shutdown, state}
   end
