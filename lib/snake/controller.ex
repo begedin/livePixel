@@ -1,6 +1,8 @@
 defmodule Snake.Controller do
   alias Snake.Game
 
+  require Logger
+
   @arrow_keys ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]
 
   @direction %{

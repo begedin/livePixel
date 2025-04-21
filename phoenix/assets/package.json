@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "howler": "^2.2.4",
+    "pixi.js": "^7.2.4"
+  },
+  "devDependencies": {
+    "@types/howler": "^2.2.11"
+  }
+}

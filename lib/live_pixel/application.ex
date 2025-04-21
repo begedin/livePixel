@@ -7,6 +7,24 @@ defmodule LivePixel.Application do
 
   @impl true
   def start(_type, _args) do
+    case Application.get_env(:live_pixel, :game) do
+      :snake -> start_snake()
+      _ -> start_phx()
+    end
+  end
+
+  defp start_snake() do
+    IO.puts("Starting snake")
+
+    children = [
+      Snake.GLGame
+    ]
+
+    opts = [strategy: :one_for_one, name: LivePixel.Supervisor, auto_shutdown: :any_significant]
+    Supervisor.start_link(children, opts)
+  end
+
+  defp start_phx() do
     children = [
       # Start the Telemetry supervisor
       LivePixelWeb.Telemetry,

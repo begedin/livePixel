@@ -8,7 +8,7 @@ defmodule LivePixel.MixProject do
     [
       app: :live_pixel,
       version: "0.1.0",
-      elixir: "~> 1.14",
+      elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -22,7 +22,7 @@ defmodule LivePixel.MixProject do
   def application do
     [
       mod: {LivePixel.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :wx, :observer, :runtime_tools, :tools, :xmerl, :debugger]
     ]
   end
 
@@ -47,7 +47,15 @@ defmodule LivePixel.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:tailwind, "~> 0.2.1", runtime: Mix.env() == :dev},
       {:telemetry_metrics, "~> 1.0.0"},
-      {:telemetry_poller, "~> 1.1.0"}
+      {:telemetry_poller, "~> 1.1.0"},
+
+      # audio for gl version
+      {:membrane_core, "~> 1.1"},
+      {:membrane_file_plugin, "~> 0.17.2"},
+      {:membrane_portaudio_plugin, "~> 0.19.2"},
+      {:membrane_ffmpeg_swresample_plugin, "~> 0.20.2"},
+      {:membrane_mp3_mad_plugin, "~> 0.18.3"},
+      {:membrane_funnel_plugin, "~> 0.9.0"}
     ]
   end
 
