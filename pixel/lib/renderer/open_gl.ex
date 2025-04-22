@@ -1,6 +1,4 @@
 defmodule Pixel.Renderer.OpenGL do
-  alias Pixel.Math.Mat4
-
   def init() do
     do_enables()
 
@@ -14,12 +12,16 @@ defmodule Pixel.Renderer.OpenGL do
     :gl.enable(:gl_const.gl_blend())
   end
 
-  def set_2d(w, h) do
-    projection = Mat4.ortho(0.0, w + 0.0, h + 0.0, 0.0, -1.0, 1.0)
-
+  def set_2d() do
     [_, _, fb_width, fb_height | _] = :gl.getIntegerv(:gl_const.gl_viewport())
     :gl.viewport(0, 0, fb_width, fb_height)
+  end
 
-    projection
+  def log_info do
+    IO.puts("🧠 OpenGL Info:")
+    IO.puts("🔹 Version: #{:gl.getString(:gl_const.gl_version())}")
+    IO.puts("🔹 Renderer: #{:gl.getString(:gl_const.gl_renderer())}")
+    IO.puts("🔹 Vendor: #{:gl.getString(:gl_const.gl_vendor())}")
+    IO.puts("🔹 GLSL: #{:gl.getString(:gl_const.gl_shading_language_version())}")
   end
 end

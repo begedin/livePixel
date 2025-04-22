@@ -63,8 +63,6 @@ defmodule Pixel.Renderer.ImageParser do
   defp reconstruct_png(
          %{IDAT: data, IHDR: %{width: width, height: height, type: type, depth: depth}} = map
        ) do
-    if width == 256 and height == 96, do: dbg(map)
-
     bytes_per_pixel =
       case type do
         0 -> depth / 8
@@ -196,6 +194,15 @@ defmodule Pixel.Renderer.ImageParser do
     {:tEXt, %{keyword: keyword, data: data}}
   end
 
+  @platform_signatures %{
+    "MSFT" => :microsoft,
+    "APPL" => :apple,
+    "ADBE" => :adobe,
+    "SUNW" => :sun_microsystems,
+    "SGI " => :silicon_graphics,
+    "TGNT" => :taligent
+  }
+
   defp do_png_chunk("iTXt", data) do
     [keyword, data] = :binary.split(data, <<0>>)
     <<compression_flag::8, compression_method::8, data::binary>> = data
@@ -310,72 +317,14 @@ defmodule Pixel.Renderer.ImageParser do
           _ -> :unknown
         end,
       color_space_raw: color_space,
-      color_space:
-        case color_space do
-          "XYZ " ->
-            [:nciexyz, :pcsxyz]
-
-          "Lab " ->
-            [:cielab, :pcslab]
-
-          "Luv " ->
-            :cieluv
-
-          "YCbr" ->
-            :ycbcr
-
-          "Yxy " ->
-            :cieyxy
-
-          "RGB " ->
-            :rgb
-
-          "GRAY" ->
-            :gray
-
-          "HSV " ->
-            :hsv
-
-          "HLS " ->
-            :hls
-
-          "CMYK" ->
-            :cmyk
-
-          "CMY " ->
-            :cmy
-
-          # 2-15 color
-          <<digit, "CLR">> when digit in ?0..?9//1 ->
-            String.to_atom("color_#{[digit]}")
-
-          <<digit, "CLR">> when digit in ?A..?F//1 ->
-            String.to_atom("color_#{digit - ?A + 10}")
-        end,
+      color_space: map_color_space(color_space),
       pcs_raw: pcs,
       # TODO: kind of awkward to duplicate this.
-      pcs:
-        case color_space do
-          # oh, this is where I decide (n)cie/pcs, I think?
-          "XYZ " -> [:nciexyz, :pcsxyz]
-          "Lab " -> [:cielab, :pcslab]
-          _ -> :unknown
-        end,
+      pcs: map_pcs(color_space),
       creation_date_time_raw: creation_date_time,
       creation_date_time: parse_iccp_date_time(creation_date_time),
       primary_platform_signature_raw: primary_platform_signature,
-      primary_platform_signature:
-        case primary_platform_signature do
-          "MSFT" -> :microsoft
-          "APPL" -> :apple
-          # this isn't specified in icc.1:2022, but is in some random other icc profile parser (icc node package)
-          "ADBE" -> :adobe
-          "SUNW" -> :sun_microsystems
-          "SGI " -> :silicon_graphics
-          # this isn't specified in icc.1:2022, but is in some random other icc profile parser (icc node package)
-          "TGNT" -> :taligent
-          _ -> :unknown
-        end,
+      primary_platform_signature: @platform_signatures[primary_platform_signature] || :unknown,
       profile_flags: %{
         embedded: flag_embedded,
         independent: flag_independent
@@ -391,7 +340,7 @@ defmodule Pixel.Renderer.ImageParser do
       nciexyz: nciexyz,
       signature: signature,
       profile_id: profile_id,
-      # TODO: This is just a list of pointers to the rest of the data
+      # This is just a list of pointers to the rest of the data
       tag_table: parse_tag_table(tag_table)
     }
 
@@ -428,6 +377,29 @@ defmodule Pixel.Renderer.ImageParser do
     IO.puts("unknown type #{type}")
     {String.to_atom(type), %{data: data}}
   end
+
+  defp map_color_space(<<"Lab ", _::binary>>), do: [:cielab, :pcslab]
+  defp map_color_space(<<"Luv ", _::binary>>), do: :cieluv
+  defp map_color_space(<<"YCbr", _::binary>>), do: :ycbcr
+  defp map_color_space(<<"Yxy ", _::binary>>), do: :cieyxy
+  defp map_color_space(<<"RGB ", _::binary>>), do: :rgb
+  defp map_color_space(<<"GRAY", _::binary>>), do: :gray
+  defp map_color_space(<<"HSV ", _::binary>>), do: :hsv
+  defp map_color_space(<<"HLS ", _::binary>>), do: :hls
+  defp map_color_space(<<"CMYK", _::binary>>), do: :cmyk
+  defp map_color_space(<<"CMY ", _::binary>>), do: :cmy
+
+  defp map_color_space(<<digit, "CLR">>) when digit in ?0..?9//1 do
+    String.to_atom("color_#{[digit]}")
+  end
+
+  defp map_color_space(<<digit, "CLR">>) when digit in ?A..?F//1 do
+    String.to_atom("color_#{digit - ?A + 10}")
+  end
+
+  defp map_pcs(<<"XYZ ", _::binary>>), do: [:nciexyz, :pcsxyz]
+  defp map_pcs(<<"Lab ", _::binary>>), do: [:cielab, :pcslab]
+  defp map_pcs(_), do: :unknown
 
   defp parse_iccp_date_time(<<year::16, month::16, day::16, hours::16, minutes::16, seconds::16>>) do
     DateTime.new(Date.new!(year, month, day), Time.new!(hours, minutes, seconds))

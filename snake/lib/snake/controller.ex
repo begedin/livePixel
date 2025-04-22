@@ -19,7 +19,9 @@ defmodule Snake.Controller do
     end
   end
 
-  def run(%{} = state, {:keydown, " "}) do
+  def run(%{} = state, {:keydown, " "}), do: run(state, {:keydown, "Space"})
+
+  def run(%{} = state, {:keydown, "Space"}) do
     case Game.get_all_components(state, :game_state) do
       [{player_id, "playing"}] -> Game.set_component(state, player_id, :game_state, "pause")
       [{player_id, "pause"}] -> Game.set_component(state, player_id, :game_state, "playing")

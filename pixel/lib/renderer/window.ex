@@ -60,8 +60,11 @@ defmodule Pixel.Renderer.Window do
     }
   end
 
-  def connect_keyboard(%__MODULE__{} = window, callback) do
-    :wxGLCanvas.connect(window.canvas, :key_down, callback: callback)
-    :wxGLCanvas.connect(window.canvas, :key_up, callback: callback)
+  def set_current(%__MODULE__{} = window) do
+    :wxGLCanvas.setCurrent(window.canvas, window.context)
+  end
+
+  def swap_buffers(%__MODULE__{} = window) do
+    :wxGLCanvas.swapBuffers(window.canvas)
   end
 end
