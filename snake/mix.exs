@@ -8,7 +8,8 @@ defmodule Snake.MixProject do
       elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      releases: releases()
     ]
   end
 
@@ -29,7 +30,23 @@ defmodule Snake.MixProject do
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       # audio for gl version
       {:easing, "~> 0.3.1"},
-      {:pixel, path: "../pixel"}
+      {:pixel, path: "../pixel"},
+      {:burrito, "~> 1.0"}
+    ]
+  end
+
+  def releases do
+    [
+      snake: [
+        steps: [:assemble, &Burrito.wrap/1],
+        burrito: [
+          targets: [
+            # macos: [os: :darwin, cpu: :x86_64],
+            linux: [os: :linux, cpu: :x86_64]
+            # windows: [os: :windows, cpu: :x86_64]
+          ]
+        ]
+      ]
     ]
   end
 end
