@@ -131,13 +131,11 @@ defmodule Pixel.Loop do
 
   def handle_cast({:key_down, keycode}, state) do
     keys = Enum.uniq([keycode | state.keys])
-    apply(state.user_mod, :keyboard, [state.user_state, keys])
     {:noreply, %{state | keys: keys}}
   end
 
   def handle_cast({:key_up, keycode}, state) do
     keys = List.delete(state.keys, keycode)
-    apply(state.user_mod, :keyboard, [state.user_state, keys])
     {:noreply, %{state | keys: keys}}
   end
 
