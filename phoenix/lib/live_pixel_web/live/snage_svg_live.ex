@@ -26,7 +26,7 @@ defmodule LivePixelWeb.SnakeSVGLive do
     assigns =
       assign(
         assigns,
-        game_state: Game.render(assigns.game_state),
+        render_state: Game.render(assigns.game_state),
         game_width: config.width,
         game_height: config.height
       )
@@ -48,7 +48,7 @@ defmodule LivePixelWeb.SnakeSVGLive do
           viewBox={"0 0 #{@game_width} #{@game_height}"}
         >
           <rect
-            :for={entity <- @game_state.world}
+            :for={entity <- @render_state.world}
             x={entity["x"] * entity["width"]} y={entity["y"] * entity["height"]}
             width={entity["width"]} height={entity["height"]}
             fill={"#{rgb_to_hex(entity["color"])}"} />
@@ -96,6 +96,10 @@ defmodule LivePixelWeb.SnakeSVGLive do
   end
 
   def handle_info(:update, socket) do
+    IO.inspect(
+      {Game.game_over?(socket.assigns.game_state), Game.playing?(socket.assigns.game_state)}
+    )
+
     state =
       if Game.playing?(socket.assigns.game_state) do
         socket.assigns.game_state
