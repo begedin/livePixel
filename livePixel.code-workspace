@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "phoenix"
+		},
+		{
+			"path": "pixel"
+		},
+		{
+			"path": "snake"
+		}
+	],
+	"settings": {}
+}
