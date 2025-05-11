@@ -129,10 +129,12 @@ defmodule Snake.GLGame do
   end
 
   @impl true
-  @spec terminate(any(), struct) :: none()
-  def terminate(reason, %__MODULE__{} = state) do
+  @spec terminate(any(), struct) :: :ok
+  def terminate(reason, _state) do
     Logger.info("Terminating game: #{reason}")
-    System.halt(0)
-    state
+    # Schedule the system halt to happen after this function returns
+    # This avoids the "has no local return" warning while still shutting down the app
+    spawn(fn -> System.stop(0) end)
+    :ok
   end
 end

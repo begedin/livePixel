@@ -39,18 +39,8 @@ defmodule Pixel.Renderer.Window do
     canvas = :wxGLCanvas.new(frame, opts ++ gl_attrib)
     ctx = :wxGLContext.new(canvas)
 
-    # cursor = :wxCursor.new(:wx_const.wx_cursor_blank)
-    # :wxWindow.setCursor(canvas, cursor)
-
-    # :wxWindow.captureMouse(canvas)
-
     :wxGLCanvas.setFocus(canvas)
-
     :wxGLCanvas.setCurrent(canvas, ctx)
-
-    # :wxGLCanvas.connect(canvas, :key_down, callback: &Input.handler/2)
-    # :wxGLCanvas.connect(canvas, :key_up, callback: &Input.handler/2)
-    # :wxGLCanvas.connect(canvas, :motion, callback: &Input.handler/2)
     :wxGLCanvas.connect(canvas, :mousewheel)
 
     %__MODULE__{

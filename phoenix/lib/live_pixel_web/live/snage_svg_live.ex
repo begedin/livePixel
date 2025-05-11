@@ -96,10 +96,6 @@ defmodule LivePixelWeb.SnakeSVGLive do
   end
 
   def handle_info(:update, socket) do
-    IO.inspect(
-      {Game.game_over?(socket.assigns.game_state), Game.playing?(socket.assigns.game_state)}
-    )
-
     state =
       if Game.playing?(socket.assigns.game_state) do
         socket.assigns.game_state
